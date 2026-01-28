@@ -1,0 +1,116 @@
+import os
+import pygame
+import speech_recognition as sr
+import pyautogui as pg
+from pygame.time import delay
+import pyttsx3
+from google import genai
+from deep_translator import GoogleTranslator
+client = genai.Client(api_key ="мой апи ключ")
+
+
+
+
+r = sr.Recognizer()
+engine = pyttsx3.init()
+s =1
+l =1
+m =2
+
+def speak(text):
+    engine.say(text)
+    engine.runAndWait()
+speak("готов к работе")
+while s==1:
+    with sr.Microphone() as source:
+
+        audio = r.listen(source)
+
+    try:
+
+
+        a =r.recognize_google(audio, language='ru-RU')
+        print(a)
+
+
+        if 'ai' in a:
+            response = client.models.generate_content(
+                model="gemini-3-flash-preview",
+                contents=a,
+            )
+            speak(response.text)
+            print(response.text)
+            # оказывается без впн не работает
+        if 'приложение' in a:
+
+            pg.hotkey('win')
+            query=a.split("приложение")[-1].strip()
+            print(query)
+            translated = GoogleTranslator(source='ru', target='en').translate(query)
+            print(translated)
+            pg.typewrite(translated, 0.5)
+            pg.click(679, 208, duration=0.5)
+
+
+        if a == 'Сохранить':
+            pg.hotkey('ctrl', 's')
+        if a =='копировать':
+            pg.hotkey('ctrl', 'c')
+
+        if a=='вставить':
+            pg.hotkey('ctrl', 'v')
+        if a=='Привет':
+            speak("приветствую")
+            delay(1000)
+        if a=='назад':
+            pg.hotkey('ctrl','z')
+            speak("возвращенно")
+        if a == 'язык':
+            pg.hotkey('alt', 'shift')
+            speak('язык был поменят')
+        if a == 'Arduino':
+            pg.click(613, 1153, duration=0.5)
+            pg.typewrite('arduino', 0.5)
+            pg.click(679, 208, duration=0.5)
+            speak("ардуино открыто")
+        if a == 'Pay char':
+            pg.click(613, 1153, duration=0.5)
+            pg.typewrite('PyCharm Com', 0.5)
+            pg.click(679, 208, duration=0.5)
+            speak("пайчарм открыт")
+
+
+
+            delay(1000)
+            print('j')
+        if a =='свернуть':
+            pg.click(1729, 0, duration=0.5)
+            speak("свёрнуто")
+        if a =='закрыть':
+            pg.click(1865, 23, duration=0.5)
+            speak("закрыто")
+        if a =='выключить':
+            pg.click(1497, 28, duration=0.5)
+
+        if a=='питание':
+            pg.typewrite('pinMode');pg.typewrite('();')
+            speak("пинмод написан")
+        if a == 'печатать в Word':
+            pg.click(613, 1153, duration=0.5)
+            pg.typewrite('Word', 0.5)
+            pg.click(679, 208, duration=0.5)
+            speak("ворд открыт")
+        if a == 'печатать':
+            pg.click(613, 1153, duration=0.5)
+            m =2
+        if a == 'Enter':
+            pg.typewrite(['enter'])
+            speak("энтр был нажат")
+
+
+
+
+    except sr.UnknownValueError:
+        print("Google ошибка")
+    except sr.RequestError as e:
+        print("ошибка".format(e))
